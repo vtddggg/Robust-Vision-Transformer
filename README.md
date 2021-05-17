@@ -4,7 +4,7 @@ This repository contains PyTorch code for Robust Vision Transformers.
 
 They obtain competitive tradeoffs in terms of speed / precision:
 
-![RVT](.github/RVT.png)
+![RVT](RVT.png)
 
 For details see [Rethinking the Design Principles of Robust Vision Transformer](https://arxiv.org/abs/2012.12877) by Xiaofeng Mao, Gege Qi, Yuefeng Chen, Yuan He and Hui Xue. 
 

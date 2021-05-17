@@ -10,7 +10,7 @@ For details see [Rethinking the Design Principles of Robust Vision Transformer](
 
 First, clone the repository locally:
 ```
-git clone https://github.com/facebookresearch/deit.git
+git clone https://github.com/vtddggg/Robust-Vision-Transformer.git
 ```
 Then, install PyTorch 1.7.0+ and torchvision 0.8.1+ and [pytorch-image-models 0.3.2](https://github.com/rwightman/pytorch-image-models):
 

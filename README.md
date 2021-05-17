@@ -37,3 +37,5 @@ python -m torch.distributed.launch --nproc_per_node=8 --nnodes=4 main.py --model
 ```
 python -m torch.distributed.launch --nproc_per_node=8 --nnodes=4 main.py --model rvt_base --data-path /path/to/imagenet --output_dir output --batch-size 32 --dist-eval
 ```
+
+If you want to train `RVT-Ti*`, `RVT-S*` or `RVT-B*`, simply add `--use_mask` and `--use_patch_aug` to enable positon-aware attention scaling and patch-wise augmentation.

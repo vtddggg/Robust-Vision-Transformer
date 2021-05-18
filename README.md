@@ -1,4 +1,4 @@
-# RVT: Robust Vision Transformers
+# RVT: Rethinking the Design Principles of Robust Vision Transformer
 
 ***Note: Since the model is trained on our private platform, this transferred code has not been tested and may have some bugs. If you meet any problems, feel free to open an issue!***
 

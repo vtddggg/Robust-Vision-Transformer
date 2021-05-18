@@ -1,5 +1,7 @@
 # RVT: Robust Vision Transformers
 
+***Note: Since the model is trained on our private platform, this transferred code has not been tested and may have some bugs. If you meet any problems, feel free to open an issue!***
+
 This repository contains PyTorch code for Robust Vision Transformers.
 
 ![RVT](RVT.png)

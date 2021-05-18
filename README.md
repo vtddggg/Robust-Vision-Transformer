@@ -6,7 +6,7 @@ This repository contains PyTorch code for Robust Vision Transformers.
 
 ![RVT](RVT.png)
 
-For details see [Rethinking the Design Principles of Robust Vision Transformer](https://arxiv.org/abs/2105.07926) by Xiaofeng Mao, Gege Qi, Yuefeng Chen, Yuan He and Hui Xue. 
+For details see [Rethinking the Design Principles of Robust Vision Transformer](https://arxiv.org/abs/2105.07926) by Xiaofeng Mao, Gege Qi, Yuefeng Chen, Xiaodan Li, Shaokai Ye, Yuan He and Hui Xue. 
 
 # Usage
 

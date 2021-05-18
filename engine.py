@@ -29,6 +29,7 @@ def patch_level_aug(input1, patch_transform, upper_limit, lower_limit):
     patches = patches.reshape(bs, -1, channle_size,16,16).permute(0,2,3,4,1).contiguous().reshape(bs, channle_size*16*16, -1)
     output_images = F.fold(patches, (H,W), 16, stride=16)
     output_images = clamp(output_images, lower_limit, upper_limit)
+    return output_images
 
 
 def train_one_epoch(args, model: torch.nn.Module, criterion: DistillationLoss,
@@ -62,14 +63,18 @@ def train_one_epoch(args, model: torch.nn.Module, criterion: DistillationLoss,
                 K.augmentation.RandomHorizontalFlip(p=0.1)
                 )
             aug_samples = patch_level_aug(samples, patch_transform, upper_limit, lower_limit)
-            aug_samples = aug_samples.to(device, non_blocking=True)
+
+        is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
 
         with torch.cuda.amp.autocast():
-            outputs = model(samples)
             if args.use_patch_aug:
                 outputs2 = model(aug_samples)
-                loss = criterion(samples, outputs, targets) + criterion(aug_samples, outputs2, targets)
+                loss = criterion(aug_samples, outputs2, targets)
+                loss_scaler._scaler.scale(loss).backward(create_graph=is_second_order)
+                outputs = model(samples)
+                loss = criterion(samples, outputs, targets)
             else:
+                outputs = model(samples)
                 loss = criterion(samples, outputs, targets)
 
         loss_value = loss.item()
@@ -81,7 +86,6 @@ def train_one_epoch(args, model: torch.nn.Module, criterion: DistillationLoss,
         optimizer.zero_grad()
 
         # this attribute is added by timm on one optimizer (adahessian)
-        is_second_order = hasattr(optimizer, 'is_second_order') and optimizer.is_second_order
         loss_scaler(loss, optimizer, clip_grad=max_norm,
                     parameters=model.parameters(), create_graph=is_second_order)
 

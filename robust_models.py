@@ -95,7 +95,7 @@ class Block(nn.Module):
 
 class Transformer(nn.Module):
     def __init__(self, base_dim, depth, heads, mlp_ratio,
-                 drop_rate=.0, attn_drop_rate=.0, drop_path_prob=None, use_mask=False):
+                 drop_rate=.0, attn_drop_rate=.0, drop_path_prob=None, use_mask=False, masked_block=None):
         super(Transformer, self).__init__()
         self.layers = nn.ModuleList([])
         self.depth = depth
@@ -104,19 +104,49 @@ class Transformer(nn.Module):
         if drop_path_prob is None:
             drop_path_prob = [0.0 for _ in range(depth)]
 
-        self.blocks = nn.ModuleList([
-            Block(
-                dim=embed_dim,
-                num_heads=heads,
-                mlp_ratio=mlp_ratio,
-                qkv_bias=True,
-                drop=drop_rate,
-                attn_drop=attn_drop_rate,
-                drop_path=drop_path_prob[i],
-                norm_layer=partial(nn.LayerNorm, eps=1e-6),
-                use_mask=use_mask
-            )
-            for i in range(depth)])
+        if use_mask==True:
+            assert masked_block is not None
+            self.blocks = nn.ModuleList()
+            for i in range(depth):
+                if i < masked_block:
+                    self.blocks.append(Block(
+                        dim=embed_dim,
+                        num_heads=heads,
+                        mlp_ratio=mlp_ratio,
+                        qkv_bias=True,
+                        drop=drop_rate,
+                        attn_drop=attn_drop_rate,
+                        drop_path=drop_path_prob[i],
+                        norm_layer=partial(nn.LayerNorm, eps=1e-6),
+                        use_mask=use_mask
+                    ))
+                else:
+                    self.blocks.append(Block(
+                        dim=embed_dim,
+                        num_heads=heads,
+                        mlp_ratio=mlp_ratio,
+                        qkv_bias=True,
+                        drop=drop_rate,
+                        attn_drop=attn_drop_rate,
+                        drop_path=drop_path_prob[i],
+                        norm_layer=partial(nn.LayerNorm, eps=1e-6),
+                        use_mask=False
+                    ))
+        else:
+            self.blocks = nn.ModuleList([
+                Block(
+                    dim=embed_dim,
+                    num_heads=heads,
+                    mlp_ratio=mlp_ratio,
+                    qkv_bias=True,
+                    drop=drop_rate,
+                    attn_drop=attn_drop_rate,
+                    drop_path=drop_path_prob[i],
+                    norm_layer=partial(nn.LayerNorm, eps=1e-6),
+                    use_mask=use_mask
+                )
+                for i in range(depth)])
+
 
     def forward(self, x):
         B,C,H,W = x.shape
@@ -148,28 +178,27 @@ class conv_embedding(nn.Module):
     def __init__(self, in_channels, out_channels, patch_size,
                  stride, padding):
         super(conv_embedding, self).__init__()
-        self.conv = nn.Conv2d(in_channels, out_channels, kernel_size=patch_size,
-                              stride=stride, padding=padding, bias=True)
+
         self.out_channels = out_channels
 
-        self.conv = nn.Sequential(
-            nn.Conv2d(in_channels, 64, kernel_size=(7, 7), stride=(2, 2), padding=(2, 2)),
-            nn.BatchNorm2d(64),
+        self.proj = nn.Sequential(
+            nn.Conv2d(in_channels, 32, kernel_size=(7, 7), stride=(2, 2), padding=(2, 2)),
+            nn.BatchNorm2d(32),
             nn.MaxPool2d(3, stride=2, padding=1),
-            nn.Conv2d(64, out_channels, kernel_size=(4, 4), stride=(4, 4))
+            nn.Conv2d(32, out_channels, kernel_size=(4, 4), stride=(4, 4))
             
         )
 
     def forward(self, x):
         B = x.shape[0]
-        x = self.conv(x)
+        x = self.proj(x)
         return x
 
 
 class PoolingTransformer(nn.Module):
     def __init__(self, image_size, patch_size, stride, base_dims, depth, heads,
                  mlp_ratio, num_classes=1000, in_chans=3,
-                 attn_drop_rate=.0, drop_rate=.0, drop_path_rate=.0, use_mask=False):
+                 attn_drop_rate=.0, drop_rate=.0, drop_path_rate=.0, use_mask=False, masked_block=None):
         super(PoolingTransformer, self).__init__()
 
         total_block = sum(depth)
@@ -201,7 +230,7 @@ class PoolingTransformer(nn.Module):
                 self.transformers.append(
                     Transformer(base_dims[stage], depth[stage], heads[stage],
                                 mlp_ratio,
-                                drop_rate, attn_drop_rate, drop_path_prob, use_mask=use_mask)
+                                drop_rate, attn_drop_rate, drop_path_prob, use_mask=use_mask, masked_block=masked_block)
                 )
             else:
                 self.transformers.append(
@@ -289,7 +318,7 @@ def rvt_small(pretrained, **kwargs):
         image_size=224,
         patch_size=16,
         stride=16,
-        base_dims=[64, 64],
+        base_dims=[64],
         depth=[12],
         heads=[6],
         mlp_ratio=4,

@@ -50,6 +50,7 @@ def get_args_parser():
 
     # RVT params
     parser.add_argument('--use_mask', action='store_true')
+    parser.add_argument('--masked_block', type=int, default=None)
     parser.add_argument('--use_patch_aug', action='store_true')
 
     # Optimizer parameters
@@ -168,6 +169,7 @@ def get_args_parser():
     parser.set_defaults(pin_mem=True)
 
     # distributed training parameters
+    parser.add_argument("--local_rank", default=0, type=int)
     parser.add_argument('--world_size', default=1, type=int,
                         help='number of distributed processes')
     parser.add_argument('--dist_url', default='env://', help='url used to set up distributed training')
@@ -187,22 +189,21 @@ def setup_for_distributed(is_master):
 
     __builtin__.print = print
 
-def main(gpu, ngpus_per_node, world_size, rank, args):
-
-    args.world_size = world_size
-    args.rank = rank * ngpus_per_node + gpu
-    args.gpu = gpu
-    args.distributed = True
-
-    torch.cuda.set_device(args.gpu)
-
-    args.dist_backend = 'nccl'
-    print('| distributed init {}(rank {})'.format(
-        args.world_size, args.rank), flush=True)
-    torch.distributed.init_process_group(backend='nccl', init_method=args.dist_url,
-                                         world_size=args.world_size, rank=args.rank)
-    torch.distributed.barrier()
-    setup_for_distributed(args.rank == 0)
+def main(args):
+    if 'RANK' in os.environ and 'WORLD_SIZE' in os.environ:
+        args.distributed = True
+        torch.cuda.set_device(args.local_rank)
+        args.dist_backend = 'nccl'
+        torch.distributed.init_process_group(backend='nccl', init_method=args.dist_url)
+        args.world_size = torch.distributed.get_world_size()
+        args.rank = torch.distributed.get_rank()
+        print('| distributed init {}(rank {})'.format(
+                args.world_size, args.rank), flush=True)
+        torch.distributed.barrier()
+        setup_for_distributed(args.rank == 0)
+    else:
+        print('Not using distributed mode')
+        args.distributed = False
 
     print(args)
 
@@ -278,7 +279,8 @@ def main(gpu, ngpus_per_node, world_size, rank, args):
         drop_rate=args.drop,
         drop_path_rate=args.drop_path,
         drop_block_rate=None,
-        use_mask=args.use_mask
+        use_mask=args.use_mask,
+        masked_block=args.masked_block
     )
 
     if args.finetune:
@@ -330,7 +332,7 @@ def main(gpu, ngpus_per_node, world_size, rank, args):
 
     model_without_ddp = model
     if args.distributed:
-        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.gpu])
+        model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[args.local_rank])
         model_without_ddp = model.module
     n_parameters = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print('number of params:', n_parameters)
@@ -454,13 +456,4 @@ if __name__ == '__main__':
 
     if args.output_dir:
         Path(args.output_dir).mkdir(parents=True, exist_ok=True)
-
-    torch.multiprocessing.set_start_method('spawn', force=True)
-
-    node_rank = int(os.environ['RANK'])
-    node_world_size = int(os.environ['WORLD_SIZE'])
-    ngpus_per_node = torch.cuda.device_count()
-    world_size = ngpus_per_node * node_world_size
-
-    mp.spawn(main, nprocs=ngpus_per_node, args=(
-        ngpus_per_node, world_size, node_rank, args))
+    main(args)

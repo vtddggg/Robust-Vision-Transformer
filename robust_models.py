@@ -308,7 +308,28 @@ def rvt_tiny(pretrained, **kwargs):
     model.default_cfg = _cfg()
     if pretrained:
         state_dict = \
-        torch.load('weights/pit_s_809.pth', map_location='cpu')
+        torch.load('rvt_ti.pth', map_location='cpu')['model']
+        model.load_state_dict(state_dict)
+    return model
+
+@register_model
+def rvt_tiny_plus(pretrained, **kwargs):
+    model = PoolingTransformer(
+        image_size=224,
+        patch_size=16,
+        stride=16,
+        base_dims=[32, 32],
+        depth=[10, 2],
+        heads=[6, 12],
+        mlp_ratio=4,
+        use_mask=True,
+        masked_block=10,
+        **kwargs
+    )
+    model.default_cfg = _cfg()
+    if pretrained:
+        state_dict = \
+        torch.load('rvt_ti*.pth', map_location='cpu')['model']
         model.load_state_dict(state_dict)
     return model
 
@@ -327,7 +348,28 @@ def rvt_small(pretrained, **kwargs):
     model.default_cfg = _cfg()
     if pretrained:
         state_dict = \
-        torch.load('weights/pit_s_809.pth', map_location='cpu')
+        torch.load('rvt_small.pth', map_location='cpu')['model']
+        model.load_state_dict(state_dict)
+    return model
+
+@register_model
+def rvt_small_plus(pretrained, **kwargs):
+    model = PoolingTransformer(
+        image_size=224,
+        patch_size=16,
+        stride=16,
+        base_dims=[64],
+        depth=[12],
+        heads=[6],
+        mlp_ratio=4,
+        use_mask=True,
+        masked_block=5,
+        **kwargs
+    )
+    model.default_cfg = _cfg()
+    if pretrained:
+        state_dict = \
+        torch.load('rvt_small*.pth', map_location='cpu')['model']
         model.load_state_dict(state_dict)
     return model
 
@@ -337,15 +379,32 @@ def rvt_base(pretrained, **kwargs):
         image_size=224,
         patch_size=16,
         stride=16,
-        base_dims=[48],
+        base_dims=[64],
         depth=[12],
-        heads=[16],
+        heads=[12],
         mlp_ratio=4,
         **kwargs
     )
     model.default_cfg = _cfg()
     if pretrained:
-        state_dict = \
-        torch.load('weights/pit_s_809.pth', map_location='cpu')
-        model.load_state_dict(state_dict)
+        raise NotImplementedError
+    return model
+
+@register_model
+def rvt_base_plus(pretrained, **kwargs):
+    model = PoolingTransformer(
+        image_size=224,
+        patch_size=16,
+        stride=16,
+        base_dims=[64],
+        depth=[12],
+        heads=[12],
+        mlp_ratio=4,
+        use_mask=True,
+        masked_block=5,
+        **kwargs
+    )
+    model.default_cfg = _cfg()
+    if pretrained:
+        raise NotImplementedError
     return model

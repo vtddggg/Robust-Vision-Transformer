@@ -40,25 +40,26 @@ python -m torch.distributed.launch --nproc_per_node=8 --nnodes=4 main.py --model
 ```
 python -m torch.distributed.launch --nproc_per_node=8 --nnodes=4 main.py --model rvt_base --data-path /path/to/imagenet --output_dir output --batch-size 32 --dist-eval
 ```
-If you want to train `RVT-Ti*`, `RVT-S*` or `RVT-B*`, simply add `--use_mask` and `--use_patch_aug` to enable positon-aware attention scaling and patch-wise augmentation. Then modify `--masked_block` to specify which blocks to add positon-aware attention scaling.
+You can also finetune the pretrained model by adding `--pretrained`.
+
+If you want to train `RVT-Ti*`, `RVT-S*` or `RVT-B*`, simply specify `--model` as `rvt_tiny_plus`, `rvt_small_plus` or `rvt_base_plus`, then add `--use_patch_aug` to enable patch-wise augmentation.
 
 ## Testing
 ### RVT-Ti:
 ```
-python main.py --eval --resume rvt_ti.pth --model rvt_tiny --data-path /disk1/imagenet/ILSVRC/Data/CLS-LOC
+python main.py --eval --pretrained --model rvt_tiny --data-path /path/to/imagenet
 ```
 ### RVT-Ti*:
 ```
-python main.py --eval --resume rvt_ti*.pth --model rvt_tiny --data-path /disk1/imagenet/ILSVRC/Data/CLS-LOC --use_mask --masked_block 10
+python main.py --eval --pretrained --model rvt_tiny_plus --data-path /path/to/imagenet
 ```
 ### RVT-S:
 ```
-python main.py --eval --resume rvt_small.pth --model rvt_small --data-path /disk1/imagenet/ILSVRC/Data/CLS-LOC --use_mask --masked_block 10
+python main.py --eval --pretrained --model rvt_small --data-path /path/to/imagenet
 ```
-
 ### RVT-S*:
 ```
-python main.py --eval --resume rvt_small*.pth --model rvt_small --data-path /disk1/imagenet/ILSVRC/Data/CLS-LOC --use_mask --masked_block 5
+python main.py --eval --pretrained --model rvt_small_plus --data-path /path/to/imagenet
 ```
 
 # Pretrained weights

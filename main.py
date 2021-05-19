@@ -49,8 +49,6 @@ def get_args_parser():
     parser.add_argument('--model-ema-force-cpu', action='store_true', default=False, help='')
 
     # RVT params
-    parser.add_argument('--use_mask', action='store_true')
-    parser.add_argument('--masked_block', type=int, default=None)
     parser.add_argument('--use_patch_aug', action='store_true')
 
     # Optimizer parameters
@@ -141,6 +139,7 @@ def get_args_parser():
 
     # * Finetuning params
     parser.add_argument('--finetune', default='', help='finetune from checkpoint')
+    parser.add_argument('--pretrained', action='store_true', help='load pretrained model')
 
     # Dataset parameters
     parser.add_argument('--data-path', default='/datasets01/imagenet_full_size/061417/', type=str,
@@ -274,13 +273,11 @@ def main(args):
     print(f"Creating model: {args.model}")
     model = create_model(
         args.model,
-        pretrained=False,
+        pretrained=args.pretrained,
         num_classes=args.nb_classes,
         drop_rate=args.drop,
         drop_path_rate=args.drop_path,
-        drop_block_rate=None,
-        use_mask=args.use_mask,
-        masked_block=args.masked_block
+        drop_block_rate=None
     )
 
     if args.finetune:

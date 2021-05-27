@@ -1,4 +1,4 @@
-# RVT: Rethinking the Design Principles of Robust Vision Transformer
+# RVT: Towards Robust Vision Transformer
 
 ***Note: Since the model is trained on our private platform, this transferred code has not been tested and may have some bugs. If you meet any problems, feel free to open an issue!***
 
@@ -6,7 +6,7 @@ This repository contains PyTorch code for Robust Vision Transformers.
 
 ![RVT](RVT.png)
 
-For details see our paper "Rethinking the Design Principles of Robust Vision Transformer"
+For details see our paper "Towards Robust Vision Transformer"
 
 # Usage
 

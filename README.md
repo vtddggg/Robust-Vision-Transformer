@@ -45,6 +45,9 @@ You can also finetune the pretrained model by adding `--pretrained`.
 If you want to train `RVT-Ti*`, `RVT-S*` or `RVT-B*`, simply specify `--model` as `rvt_tiny_plus`, `rvt_small_plus` or `rvt_base_plus`, then add `--use_patch_aug` to enable patch-wise augmentation.
 
 ## Testing
+
+***News: The robustness evaluation now is supported!! Because of the environmental differences, the results of robustness may have the fluctuations of ±0.1~0.3% compared with paper results.***
+
 ### RVT-Ti:
 ```
 python main.py --eval --pretrained --model rvt_tiny --data-path /path/to/imagenet
@@ -61,6 +64,10 @@ python main.py --eval --pretrained --model rvt_small --data-path /path/to/imagen
 ```
 python main.py --eval --pretrained --model rvt_small_plus --data-path /path/to/imagenet
 ```
+
+To enable robustness evaluation, please add one of `--inc_path /path/to/imagenet-c`, `--ina_path /path/to/imagenet-a`, `--inr_path /path/to/imagenet-r` or `--insk_path /path/to/imagenet-sketch` to test ImageNet-C, ImageNet-A, ImageNet-R or ImageNet-Sketch.
+
+If you want to test the accuracy under adversarial attackers, please add `--fgsm_test` or `--pgd_test`.
 
 # Pretrained weights
 

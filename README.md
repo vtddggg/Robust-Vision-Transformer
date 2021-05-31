@@ -65,7 +65,7 @@ python main.py --eval --pretrained --model rvt_small --data-path /path/to/imagen
 python main.py --eval --pretrained --model rvt_small_plus --data-path /path/to/imagenet
 ```
 
-To enable robustness evaluation, please add one of `--inc_path /path/to/imagenet-c`, `--ina_path /path/to/imagenet-a`, `--inr_path /path/to/imagenet-r` or `--insk_path /path/to/imagenet-sketch` to test ImageNet-C, ImageNet-A, ImageNet-R or ImageNet-Sketch.
+To enable robustness evaluation, please add one of `--inc_path /path/to/imagenet-c`, `--ina_path /path/to/imagenet-a`, `--inr_path /path/to/imagenet-r` or `--insk_path /path/to/imagenet-sketch` to test [ImageNet-C](https://github.com/hendrycks/robustness), [ImageNet-A](https://github.com/hendrycks/natural-adv-examples), [ImageNet-R](https://github.com/hendrycks/imagenet-r) or [ImageNet-Sketch](https://github.com/HaohanWang/ImageNet-Sketch).
 
 If you want to test the accuracy under adversarial attackers, please add `--fgsm_test` or `--pgd_test`.
 

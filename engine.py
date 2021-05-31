@@ -21,6 +21,36 @@ import torch.nn.functional as F
 def clamp(X, lower_limit, upper_limit):
     return torch.max(torch.min(X, upper_limit), lower_limit)
 
+def PGDAttack(x, y, model, attack_epsilon, attack_alpha, lower_limit, loss_fn, upper_limit, max_iters, random_init):
+    model.eval()
+
+    delta = torch.zeros_like(x).cuda()
+    if random_init:
+        for iiiii in range(len(attack_epsilon)):
+            delta[:, iiiii, :, :].uniform_(-attack_epsilon[iiiii][0][0].item(), attack_epsilon[iiiii][0][0].item())
+    
+    adv_imgs = clamp(x+delta, lower_limit, upper_limit)
+    max_iters = int(max_iters)
+    adv_imgs.requires_grad = True 
+
+    with torch.enable_grad():
+        for _iter in range(max_iters):
+            
+            outputs = model(adv_imgs)
+
+            loss = loss_fn(outputs, y)
+
+            grads = torch.autograd.grad(loss, adv_imgs, grad_outputs=None, 
+                    only_inputs=True)[0]
+
+            adv_imgs.data += attack_alpha * torch.sign(grads.data) 
+            
+            adv_imgs = clamp(adv_imgs, x-attack_epsilon, x+attack_epsilon)
+
+            adv_imgs = clamp(adv_imgs, lower_limit, upper_limit)
+
+    return adv_imgs.detach()
+
 def patch_level_aug(input1, patch_transform, upper_limit, lower_limit):
     bs, channle_size, H, W = input1.shape
     patches = input1.unfold(2, 16, 16).unfold(3, 16, 16).permute(0,2,3,1,4,5).contiguous().reshape(-1, channle_size,16,16)
@@ -102,7 +132,7 @@ def train_one_epoch(args, model: torch.nn.Module, criterion: DistillationLoss,
 
 
 @torch.no_grad()
-def evaluate(data_loader, model, device):
+def evaluate(data_loader, model, device, mask=None, adv=None):
     criterion = torch.nn.CrossEntropyLoss()
 
     metric_logger = utils.MetricLogger(delimiter="  ")
@@ -115,12 +145,36 @@ def evaluate(data_loader, model, device):
         images = images.to(device, non_blocking=True)
         target = target.to(device, non_blocking=True)
 
+        if adv == 'FGSM':
+            std_imagenet = torch.tensor((0.229, 0.224, 0.225)).view(3,1,1).cuda()
+            mu_imagenet = torch.tensor((0.485, 0.456, 0.406)).view(3,1,1).cuda()
+            attack_epsilon = (1 / 255.) / std_imagenet
+            attack_alpha = (1 / 255.) / std_imagenet
+            upper_limit = ((1 - mu_imagenet)/ std_imagenet)
+            lower_limit = ((0 - mu_imagenet)/ std_imagenet)
+            adv_input = PGDAttack(images, target, model, attack_epsilon, attack_alpha, lower_limit, criterion, upper_limit, max_iters=1, random_init=False)
+        elif adv == "PGD":
+            std_imagenet = torch.tensor((0.229, 0.224, 0.225)).view(3,1,1).cuda()
+            mu_imagenet = torch.tensor((0.485, 0.456, 0.406)).view(3,1,1).cuda()
+            attack_epsilon = (1 / 255.) / std_imagenet
+            attack_alpha = (0.5 / 255.) / std_imagenet
+            upper_limit = ((1 - mu_imagenet)/ std_imagenet)
+            lower_limit = ((0 - mu_imagenet)/ std_imagenet)
+            adv_input = PGDAttack(images, target, model, attack_epsilon, attack_alpha, lower_limit, criterion, upper_limit, max_iters=5, random_init=True)
+
         # compute output
         with torch.cuda.amp.autocast():
-            output = model(images)
+            if adv:
+                output = model(adv_input)
+            else:
+                output = model(images)
             loss = criterion(output, target)
 
-        acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        if mask is None:
+            acc1, acc5 = accuracy(output, target, topk=(1, 5))
+        else:
+            acc1, acc5 = accuracy(output[:,mask], target, topk=(1, 5))
+
 
         batch_size = images.shape[0]
         metric_logger.update(loss=loss.item())

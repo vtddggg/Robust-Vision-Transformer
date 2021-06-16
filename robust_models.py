@@ -17,25 +17,39 @@ class Mlp(nn.Module):
         super().__init__()
         out_features = out_features or in_features
         hidden_features = hidden_features or in_features
-        self.fc1 = nn.Conv2d(in_features, hidden_features, 1)
-        self.bn1 = nn.BatchNorm2d(hidden_features)
-        self.dwconv = nn.Conv2d(hidden_features, hidden_features, 3, padding=1, groups=hidden_features)
-        self.bn2 = nn.BatchNorm2d(hidden_features)
-        self.act = act_layer()
-        self.fc2 = nn.Conv2d(hidden_features, out_features, 1)
-        self.bn3 = nn.BatchNorm2d(out_features)
-        self.drop = nn.Dropout(drop)
+        self.in_features = in_features
+        if in_features == 768:
+            self.fc1 = nn.Linear(in_features, hidden_features)
+            self.act = act_layer()
+            self.fc2 = nn.Linear(hidden_features, out_features)
+            self.drop = nn.Dropout(drop)
+        else:
+            self.fc1 = nn.Conv2d(in_features, hidden_features, 1)
+            self.bn1 = nn.BatchNorm2d(hidden_features)
+            self.dwconv = nn.Conv2d(hidden_features, hidden_features, 3, padding=1, groups=hidden_features)
+            self.bn2 = nn.BatchNorm2d(hidden_features)
+            self.act = act_layer()
+            self.fc2 = nn.Conv2d(hidden_features, out_features, 1)
+            self.bn3 = nn.BatchNorm2d(out_features)
+            self.drop = nn.Dropout(drop)
 
     def forward(self, x):
-        B,N,C = x.shape
-        x = x.reshape(B, int(N**0.5), int(N**0.5), C).permute(0,3,1,2)
-        x = self.bn1(self.fc1(x))
-        x = self.act(x)
-        x = self.drop(x)
-        x = self.act(self.bn2(self.dwconv(x)))
-        x = self.bn3(self.fc2(x))
-        x = self.drop(x)
-        x = x.permute(0,2,3,1).reshape(B, -1, C)
+        if self.in_features == 768:
+            x = self.fc1(x)
+            x = self.act(x)
+            x = self.drop(x)
+            x = self.fc2(x)
+            x = self.drop(x)
+        else:
+            B,N,C = x.shape
+            x = x.reshape(B, int(N**0.5), int(N**0.5), C).permute(0,3,1,2)
+            x = self.bn1(self.fc1(x))
+            x = self.act(x)
+            x = self.drop(x)
+            x = self.act(self.bn2(self.dwconv(x)))
+            x = self.bn3(self.fc2(x))
+            x = self.drop(x)
+            x = x.permute(0,2,3,1).reshape(B, -1, C)
         return x
 
 class Attention(nn.Module):
@@ -54,7 +68,7 @@ class Attention(nn.Module):
 
         self.use_mask = use_mask
         if use_mask:
-            self.att_mask = nn.Parameter(torch.Tensor(self.num_heads, 196 // ((self.num_heads // 6)**2), 196 // ((self.num_heads // 6)**2)))
+            self.att_mask = nn.Parameter(torch.Tensor(self.num_heads, 196, 196))
 
     def forward(self, x):
         B, N, C = x.shape
@@ -387,7 +401,9 @@ def rvt_base(pretrained, **kwargs):
     )
     model.default_cfg = _cfg()
     if pretrained:
-        raise NotImplementedError
+        state_dict = \
+        torch.load('rvt_base.pth', map_location='cpu')['model']
+        model.load_state_dict(state_dict)
     return model
 
 @register_model
@@ -406,5 +422,7 @@ def rvt_base_plus(pretrained, **kwargs):
     )
     model.default_cfg = _cfg()
     if pretrained:
-        raise NotImplementedError
+        state_dict = \
+        torch.load('rvt_base*.pth', map_location='cpu')['model']
+        model.load_state_dict(state_dict)
     return model

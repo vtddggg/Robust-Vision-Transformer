@@ -88,3 +88,13 @@ If you want to test the accuracy under adversarial attackers, please add `--fgsm
 | `rvt_tiny*` | 1.3 G | 79.3 | [link](https://drive.google.com/file/d/1zKq6_WT2Y4eHHSARmdU-CkA3rttysPd7/view?usp=sharing) |
 | `rvt_small*` | 4.7 G | 81.8 | [link](https://drive.google.com/file/d/1g40huqDVthjS2H5sQV3ppcfcWEzn9ekv/view?usp=sharing) |
 | `rvt_base*` | 17.7 G | 83.6 | [link](https://drive.google.com/file/d/13pEjHNij9YPjCyI7_sOAVQ7FfFgWaC5W/view?usp=sharing) |
+
+# Citation
+```
+@article{mao2021rethinking,
+  title={Towards Robust Vision Transformer},
+  author={Mao, Xiaofeng and Qi, Gege and Chen, Yuefeng and Li, Xiaodan and Ye, Shaokai and He, Yuan and Xue, Hui},
+  journal={arXiv preprint arXiv:2105.07926},
+  year={2021}
+}
+```

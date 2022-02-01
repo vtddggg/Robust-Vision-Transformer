@@ -97,7 +97,7 @@ If you want to test the accuracy under adversarial attackers, please add `--fgsm
 
 | Model name   |  clean accuracy  | PGD accuracy  | weights |
 |:-------:|:--------:|:--------:|:--------:|
-| `adv_deit_tiny` |  52.04 | 26.55 | [link](https://drive.google.com/file/d/11In1SXM_SmDO2OqgabGlkZ4jacjGuPlV/view?usp=sharing) |
+| `adv_deit_tiny` |  52.05 | 26.55 | [link](https://drive.google.com/file/d/11In1SXM_SmDO2OqgabGlkZ4jacjGuPlV/view?usp=sharing) |
 | `adv_rvt_tiny` |  54.91 | 28.1 | [link](https://drive.google.com/file/d/1FdtGl1nNHmt3q_zVLobRNS-KxMmhgFmy/view?usp=sharing) |
 
 To test these models, run following commands:

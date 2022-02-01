@@ -1,7 +1,7 @@
 # RVT: Towards Robust Vision Transformer
 
 
-### News: We add adversarial training result of RVT here!!
+### News: We add adversarial training result of RVT [here](https://github.com/vtddggg/Robust-Vision-Transformer#adversarially-trained-weights) !!
 
 
 This repository contains PyTorch code for Robust Vision Transformers.

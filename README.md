@@ -1,8 +1,12 @@
 # RVT: Towards Robust Vision Transformer
 
-***Note: Since the model is trained on our private platform, this transferred code has not been tested and may have some bugs. If you meet any problems, feel free to open an issue!***
+
+### News: We add adversarial training result of RVT here!!
+
 
 This repository contains PyTorch code for Robust Vision Transformers.
+
+***Note: Since the model is trained on our private platform, this transferred code has not been tested and may have some bugs. If you meet any problems, feel free to open an issue!***
 
 ![RVT](RVT.png)
 
@@ -88,6 +92,23 @@ If you want to test the accuracy under adversarial attackers, please add `--fgsm
 | `rvt_tiny*` | 1.3 G | 79.3 | [link](https://drive.google.com/file/d/1zKq6_WT2Y4eHHSARmdU-CkA3rttysPd7/view?usp=sharing) |
 | `rvt_small*` | 4.7 G | 81.8 | [link](https://drive.google.com/file/d/1g40huqDVthjS2H5sQV3ppcfcWEzn9ekv/view?usp=sharing) |
 | `rvt_base*` | 17.7 G | 83.6 | [link](https://drive.google.com/file/d/13pEjHNij9YPjCyI7_sOAVQ7FfFgWaC5W/view?usp=sharing) |
+
+# Adversarially trained weights
+
+| Model name   |  clean accuracy  | PGD accuracy  | weights |
+|:-------:|:--------:|:--------:|:--------:|
+| `adv_deit_tiny` |  52.04 | 26.55 | [link](https://drive.google.com/file/d/11In1SXM_SmDO2OqgabGlkZ4jacjGuPlV/view?usp=sharing) |
+| `adv_rvt_tiny` |  54.91 | 28.1 | [link](https://drive.google.com/file/d/1FdtGl1nNHmt3q_zVLobRNS-KxMmhgFmy/view?usp=sharing) |
+
+To test these models, run following commands:
+
+```
+python adv_test.py --model deit_tiny_patch16_224 --ckpt_path adv_deit_tiny.pth
+```
+
+```
+python adv_test.py --model rvt_tiny --ckpt_path adv_rvt_tiny.pth
+```
 
 # Citation
 ```

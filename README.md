@@ -109,13 +109,3 @@ python adv_test.py --model deit_tiny_patch16_224 --ckpt_path adv_deit_tiny.pth
 ```
 python adv_test.py --model rvt_tiny --ckpt_path adv_rvt_tiny.pth
 ```
-
-# Citation
-```
-@article{mao2021rethinking,
-  title={Towards Robust Vision Transformer},
-  author={Mao, Xiaofeng and Qi, Gege and Chen, Yuefeng and Li, Xiaodan and Ye, Shaokai and He, Yuan and Xue, Hui},
-  journal={arXiv preprint arXiv:2105.07926},
-  year={2021}
-}
-```

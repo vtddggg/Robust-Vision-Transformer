@@ -87,11 +87,11 @@ If you want to test the accuracy under adversarial attackers, please add `--fgsm
 |:-------:|:--------:|:--------:|:--------:|
 | `rvt_tiny` |  1.3 G | 78.4 | [link](https://drive.google.com/file/d/1L500fTe3MRNSfrd3bjfbMDk0M11D-bZR/view?usp=sharing) |
 | `rvt_small` |  4.7 G | 81.7 | [link](https://drive.google.com/file/d/1YW19LnWNZnx5tn0x-z-4Oypb4ZGD4QYr/view?usp=sharing) |
-| `rvt_base` |  17.7 G | 83.4 | [link](https://drive.google.com/file/d/134cHKCAz_IJ91G5fvqNCZBjZ9Z62YQDm/view?usp=sharing) |
+| `rvt_base` (ImageNet-22k) |  17.7 G | 83.4 | [link](https://drive.google.com/file/d/134cHKCAz_IJ91G5fvqNCZBjZ9Z62YQDm/view?usp=sharing) |
 | | | | |
 | `rvt_tiny*` | 1.3 G | 79.3 | [link](https://drive.google.com/file/d/1zKq6_WT2Y4eHHSARmdU-CkA3rttysPd7/view?usp=sharing) |
 | `rvt_small*` | 4.7 G | 81.8 | [link](https://drive.google.com/file/d/1g40huqDVthjS2H5sQV3ppcfcWEzn9ekv/view?usp=sharing) |
-| `rvt_base*` | 17.7 G | 83.6 | [link](https://drive.google.com/file/d/13pEjHNij9YPjCyI7_sOAVQ7FfFgWaC5W/view?usp=sharing) |
+| `rvt_base*` (ImageNet-22k) | 17.7 G | 83.6 | [link](https://drive.google.com/file/d/13pEjHNij9YPjCyI7_sOAVQ7FfFgWaC5W/view?usp=sharing) |
 
 # Adversarially trained weights
 
